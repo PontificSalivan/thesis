@@ -1,4 +1,6 @@
+from django.db.models import Sum
 from rest_framework import serializers
+
 from .models import Department, Employee
 
 
@@ -16,7 +18,8 @@ class DepartmentSerializer(serializers.ModelSerializer):
         return obj.employees.count()
 
     def get_total_salary(self, obj):
-        return sum(obj.employees.values_list('salary', flat=True))
+        aggregate = obj.employees.aggregate(salary_sum=Sum('salary'))
+        return aggregate.get('salary_sum')
 
     class Meta:
         model = Department
